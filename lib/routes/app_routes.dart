@@ -15,24 +15,20 @@ class AppRouter {
 
   late final GoRouter router = GoRouter(
     initialLocation: '/home',
-    // ESTA ES LA CLAVE: Hace que el router reaccione cuando cambia isPrimeraVez
     refreshListenable: configProvider, 
     
     redirect: (context, state) {
       final bool isPrimeraVez = configProvider.isPrimeraVez;
       final bool yendoAlOnboarding = state.uri.toString() == '/onboarding';
 
-      // 1. Si es primera vez y NO estamos en onboarding -> Mandar a Onboarding
       if (isPrimeraVez && !yendoAlOnboarding) {
         return '/onboarding';
       }
-
-      // 2. Si YA NO es primera vez y seguimos en onboarding -> Mandar a Home
       if (!isPrimeraVez && yendoAlOnboarding) {
         return '/home';
       }
 
-      // Dejar pasar
+
       return null;
     },
     
@@ -41,7 +37,6 @@ class AppRouter {
       GoRoute(path: '/onboarding', builder: (context, state) => OnboardingScreen()),
       GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
       
-      // TUS ANIMACIONES PERSONALIZADAS (INTACTAS)
       GoRoute(
         path: '/detail',
         pageBuilder: (context, state) {
