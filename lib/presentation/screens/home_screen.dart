@@ -80,29 +80,29 @@ class _mostrarProductos extends StatelessWidget {
         padding: EdgeInsets.all(10),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20,
           childAspectRatio: 0.7,
         ),
         itemCount: productos.length,
         itemBuilder: (context, index) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadiusGeometry.circular(20)
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(20),
-                    child: Image(image: NetworkImage(productos[index].imageUrl)),
+          return GestureDetector(
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadiusGeometry.circular(15),
+                      child: Image(image: NetworkImage(productos[index].imageUrl),fit: BoxFit.cover,),
+                      
+                    ),
                   ),
-                ),
-                Text('${productos[index].business} ${productos[index].name}', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),textAlign: TextAlign.start,),
-                Text('${productos[index].price.toString()}€',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),textAlign: TextAlign.end,)
-              ],
+                  Text('${productos[index].business} ${productos[index].name}', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),textAlign: TextAlign.start,),
+                  Text('${productos[index].price.toString()}€',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),textAlign: TextAlign.end,)
+                ],
+              ),
             ),
           );
         },

@@ -11,6 +11,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      darkTheme: ThemeData.dark(),
+      theme: ThemeData.light(),
+      themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       title: 'FERNANSHOP',
       routerConfig: appRouter,
