@@ -11,4 +11,13 @@ class TechProductService {
     lista = techProductFromJson(response.body);
     return lista;
   }
+
+  Future<List<TechProduct>> getProductsByQuery(String query) async {
+    List<TechProduct> lista = [];
+    Uri uri = Uri.parse('${Env.endPointBase}?name=$query');
+    Response response = await get(uri, headers: {'api_key': Env.apiKey});
+    if (response.statusCode != 200) return lista;
+    lista = techProductFromJson(response.body);
+    return lista;
+  }
 }

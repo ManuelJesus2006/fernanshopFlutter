@@ -40,14 +40,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _principal extends StatelessWidget {
+class _principal extends StatefulWidget {
   const _principal({
     super.key,
   });
 
   @override
+  State<_principal> createState() => _principalState();
+}
+
+class _principalState extends State<_principal> {
+  final TextEditingController controllerSearch = TextEditingController();
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController controllerSearch = TextEditingController();
     return SafeArea(
       child: Column(
         children: [
@@ -57,6 +62,9 @@ class _principal extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controllerSearch,
+                  onChanged: (value) {
+    setState(() {}); 
+  },
                   style: TextStyle(color: Colors.grey[600]),
                   decoration: const InputDecoration(
                     hintText: 'Busque un producto...',
@@ -84,7 +92,7 @@ class _principal extends StatelessWidget {
           SizedBox(height: 10),
           Divider(thickness: 2, color: Colors.grey[800]),
           FutureBuilder(
-            future: TechProductService().getAllProducts(),
+            future: controllerSearch.text.isEmpty ? TechProductService().getAllProducts() : TechProductService().getProductsByQuery(controllerSearch.text),
             builder:
                 (
                   BuildContext context,

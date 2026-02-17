@@ -14,7 +14,7 @@ class AppRouter {
   AppRouter(this.configProvider);
 
   late final GoRouter router = GoRouter(
-    initialLocation: '/home',
+    initialLocation: '/login',
     refreshListenable: configProvider, 
     
     redirect: (context, state) {
@@ -25,7 +25,7 @@ class AppRouter {
         return '/onboarding';
       }
       if (!isPrimeraVez && yendoAlOnboarding) {
-        return '/home';
+        return '/login';
       }
 
 
