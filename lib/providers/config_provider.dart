@@ -5,6 +5,7 @@ class ConfigProvider with ChangeNotifier{
   bool temaOscuro = false;
   bool isLoading = false;
   bool isPrimeraVez = true;
+  bool enPantallaRegistro = false;
 
   ConfigProvider(){
     _comprobarPrimeraVez();
@@ -42,6 +43,16 @@ class ConfigProvider with ChangeNotifier{
     isPrimeraVez = false;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool('primeraVez', isPrimeraVez);
+    notifyListeners();
+  }
+
+  void habilitarEnSignup() {
+    enPantallaRegistro = true;
+    notifyListeners();
+  }
+
+  void deshabilitarEnSignup() {
+    enPantallaRegistro = false;
     notifyListeners();
   }
 }

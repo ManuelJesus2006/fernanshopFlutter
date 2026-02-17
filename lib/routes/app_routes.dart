@@ -1,140 +1,118 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/tech_product_model.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/models/users_model.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/home_screen.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/login_screen.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/onboarding_screen.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/product_detail.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/settings_screen.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/signup_screen.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/config_provider.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.dart';
 
 class AppRouter {
   final ConfigProvider configProvider;
+  final UsersProvider usersProvider;
 
-  AppRouter(this.configProvider);
+  AppRouter(this.configProvider, this.usersProvider);
 
   late final GoRouter router = GoRouter(
     initialLocation: '/login',
-    refreshListenable: configProvider, 
-    
+    refreshListenable: configProvider,
+
     redirect: (context, state) {
       final bool isPrimeraVez = configProvider.isPrimeraVez;
-      final bool yendoAlOnboarding = state.uri.toString() == '/onboarding';
+      final Users? usuarioLogueado = usersProvider.userLogued;
+      final String path = state.uri.path;
 
-      if (isPrimeraVez && !yendoAlOnboarding) {
-        return '/onboarding';
+      if (isPrimeraVez) {
+        return path == '/onboarding' ? null : '/onboarding';
       }
-      if (!isPrimeraVez && yendoAlOnboarding) {
+
+      if (usuarioLogueado == null && configProvider.enPantallaRegistro){
+        return '/signup';
+      }
+
+      if (usuarioLogueado == null) {
+
+        if (path == '/onboarding') return '/login';
+        if (path == '/login' || path =='/signup') {
+          return null;
+        }
+
         return '/login';
       }
 
+      if (usuarioLogueado != null) {
+        if (path == '/login' || path == '/signup' || path == '/onboarding') {
+          return '/home';
+        }
+        return null;
+      }
 
       return null;
     },
-    
+
     routes: [
-      GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
-      GoRoute(path: '/onboarding', builder: (context, state) => OnboardingScreen()),
-      GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
-      
+      GoRoute(path: '/home', builder: (context, state){
+        final index = state.extra == null ? 0 : state.extra as int;
+        return HomeScreen(indexBottomNavigationBar: index);
+      }),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        pageBuilder: (context, state) =>
+            _buildTransition(state: state, child: LoginScreen()),
+      ),
+      GoRoute(
+        path: '/signup',
+        pageBuilder: (context, state) =>
+            _buildTransition(state: state, child: SignupScreen()),
+      ),
       GoRoute(
         path: '/detail',
         pageBuilder: (context, state) {
           final producto = state.extra as TechProduct;
-
-          return CustomTransitionPage(
-            key: state.pageKey,
+          return _buildTransition(
+            state: state,
             child: ProductDetail(producto: producto),
-            transitionDuration: const Duration(milliseconds: 450),
-            reverseTransitionDuration: const Duration(milliseconds: 400),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              final curvedAnimation = CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutQuart,
-                reverseCurve: Curves.easeInQuart,
-              );
-
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(curvedAnimation),
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset.zero,
-                    end: const Offset(-0.3, 0.0),
-                  ).animate(
-                    CurvedAnimation(
-                      parent: secondaryAnimation,
-                      curve: Curves.easeOutQuart,
-                    ),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 20,
-                          offset: const Offset(-5, 0),
-                        ),
-                      ],
-                    ),
-                    child: child,
-                  ),
-                ),
-              );
-            },
           );
         },
       ),
       GoRoute(
         path: '/settings',
-        pageBuilder: (context, state) {
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: SettingsScreen(),
-            transitionDuration: const Duration(milliseconds: 450),
-            reverseTransitionDuration: const Duration(milliseconds: 400),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              final curvedAnimation = CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeOutQuart,
-                reverseCurve: Curves.easeInQuart,
-              );
-
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(curvedAnimation),
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: Offset.zero,
-                    end: const Offset(-0.3, 0.0),
-                  ).animate(
-                    CurvedAnimation(
-                      parent: secondaryAnimation,
-                      curve: Curves.easeOutQuart,
-                    ),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 20,
-                          offset: const Offset(-5, 0),
-                        ),
-                      ],
-                    ),
-                    child: child,
-                  ),
-                ),
-              );
-            },
-          );
-        },
+        pageBuilder: (context, state) =>
+            _buildTransition(state: state, child: SettingsScreen()),
       ),
     ],
   );
+
+  CustomTransitionPage _buildTransition({
+    required GoRouterState state,
+    required Widget child,
+  }) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 450),
+      reverseTransitionDuration: const Duration(milliseconds: 400),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        // Animación simple de derecha a izquierda
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeOutQuart;
+
+        var tween = Tween(
+          begin: begin,
+          end: end,
+        ).chain(CurveTween(curve: curve));
+
+        return SlideTransition(position: animation.drive(tween), child: child);
+      },
+    );
+  }
 }

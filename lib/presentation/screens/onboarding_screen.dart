@@ -237,7 +237,7 @@ class OnboardingScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         configProvider.confirmarPrimeraVez();
-                        context.push('/home');
+                        context.push('/login');
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.all(10),
@@ -245,7 +245,7 @@ class OnboardingScreen extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             10,
-                          ), // Cambia el 20 por el radio que quieras
+                          ),
                         ),
                       ),
                       child: Text(

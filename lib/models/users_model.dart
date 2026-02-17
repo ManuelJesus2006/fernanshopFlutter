@@ -11,12 +11,12 @@ Users userFromJson(String str) => Users.fromJson(json.decode(str));
 String usersToJson(List<Users> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Users {
-    String id;
+    String? id;
     String email;
     String name;
-    String pass;
+    String? pass;
     String apiKey;
-    bool administrator;
+    bool? administrator;
 
     Users({
         required this.id,
@@ -28,12 +28,12 @@ class Users {
     });
 
     factory Users.fromJson(Map<String, dynamic> json) => Users(
-        id: json["_id"],
+        id: json["_id"] == null ? null : json["_id"],
         email: json["email"],
         name: json["name"],
-        pass: json["pass"],
-        apiKey: json["api_key"],
-        administrator: json["administrator"],
+        pass: json["pass"] == null ? null : json["pass"],
+        apiKey: json["apikey"] == null ? json["api_key"] : json["apikey"],
+        administrator: json["administrator"] == null ? null : json["administrator"],
     );
 
     Map<String, dynamic> toJson() => {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/tech_product_model.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/config_provider.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/providers/products_provider.dart';
 import 'package:provider/provider.dart';
 
 class ProductDetail extends StatelessWidget {
@@ -12,6 +13,7 @@ class ProductDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
+    final productsProvider = Provider.of<ProductsProvider>(context);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -75,11 +77,17 @@ class ProductDetail extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          
+                          productsProvider.aniadirProductoCarro(producto);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Se ha insertado el producto con éxito'),
+                                action: SnackBarAction(label: 'Ver en el carro', onPressed: () {context.push('/home',extra: 2);}),
+                                duration: const Duration(seconds: 2),),
+                                
+                              );
                         },
 
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: configProvider.temaOscuro
+                          backgroundColor: Theme.of(context).brightness == Brightness.dark
                               ? Colors.grey[600]
                               : Colors.indigo,
                         ),

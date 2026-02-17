@@ -6,9 +6,10 @@ import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.d
 import 'package:practica_obligatoria_tema5_fernanshop/services/users_service.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
-  final GlobalKey<FormState> _keyFormulario = GlobalKey<FormState>();
+class SignupScreen extends StatelessWidget {
+SignupScreen({super.key});
+final GlobalKey<FormState> _keyFormulario = GlobalKey<FormState>();
+final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
   @override
@@ -19,11 +20,12 @@ class LoginScreen extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
+            
             child: Column(
               children: [
                 SizedBox(height: 60),
                 Text(
-                  'Bienvenido a',
+                  'Registresé a',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
                 Container(
@@ -58,6 +60,14 @@ class LoginScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _buildCustomInput(
+                          controller: nameController,
+                          label: 'Nombre de usuario',
+                          icon: Icons.person,
+                          keyboardType: TextInputType.name,
+                          context: context
+                        ),
+                        const SizedBox(height: 20),
+                        _buildCustomInput(
                           controller: emailController,
                           label: 'Correo Electrónico',
                           icon: Icons.alternate_email_rounded,
@@ -82,7 +92,8 @@ class LoginScreen extends StatelessWidget {
                     onPressed: () {
                       if (_keyFormulario.currentState!.validate()) {
                         usersProvider.mostrarCargando();
-                        iniciarSesion(
+                        registro(
+                          nameController.text,
                           emailController.text,
                           passController.text,
                           usersProvider,
@@ -98,22 +109,21 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Iniciar sesión',
+                      'Registrarse',
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ),
                 ),
                 SizedBox(height: 15),
                 TextButton(onPressed: (){
-                  configProvider.habilitarEnSignup();
-                  context.push('/signup');
-                }, child: Text('¿Sin cuenta? Regístrese')),
+                  configProvider.deshabilitarEnSignup();
+                }, child: Text('¿Tiene una cuenta? Inicie sesión')),
                 if (usersProvider.isLoading)
                   const Center(child: CircularProgressIndicator())
-                else if (usersProvider.loginFailed)
+                else if (usersProvider.registerFailed)
                   const Center(
                     child: Text(
-                      'Usuario o contraseña incorrectos',
+                      'Revise los terminos introducidos y vuelva a intentarlo: La contraseña debe tener 5 carácteres como mínimo',
                       style: TextStyle(
                         color: Colors.red,
                         fontSize: 16,
@@ -129,19 +139,21 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void iniciarSesion(
+  void registro(
+    String name,
     String email,
     String pass,
     UsersProvider usersProvider,
     BuildContext context,
   ) async {
-    Users? userFromRequest = await UsersService().loginWithEmailAndPass(
+    Users? userFromRequest = await UsersService().registerWithNameEmailAndPass(
+      name,
       email,
       pass,
     );
     if (userFromRequest != null){
       usersProvider.confirmarLogueo(userFromRequest);
-    }else usersProvider.confirmarLogueoInvalido();
+    }else usersProvider.confirmarRegistroInvalido();
   }
 }
 
