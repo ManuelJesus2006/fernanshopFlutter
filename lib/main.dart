@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/providers/button_configuration_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/config_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/products_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.dart';
@@ -29,7 +30,8 @@ class AppState extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ConfigProvider()),
         ChangeNotifierProvider(create: (_) => UsersProvider()),
-        ChangeNotifierProvider(create: (_) => ProductsProvider())
+        ChangeNotifierProvider(create: (_) => ProductsProvider()),
+        ChangeNotifierProvider(create: (_) => ButtonConfigurationProvider())
       ],
       child: MainApp(),
     );

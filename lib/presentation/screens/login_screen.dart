@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/users_model.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/providers/button_configuration_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/config_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/services/users_service.dart';
@@ -15,6 +16,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
     final usersProvider = Provider.of<UsersProvider>(context);
+    final buttonConfigurationProvider = Provider.of<ButtonConfigurationProvider>(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -81,14 +83,16 @@ class LoginScreen extends StatelessWidget {
                 SizedBox(height: 20),
                 Center(
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: buttonConfigurationProvider.botonClickado ? null : () {
                       if (_keyFormulario.currentState!.validate()) {
+                        buttonConfigurationProvider.switchBotones();
                         usersProvider.mostrarCargando();
                         iniciarSesion(
                           emailController.text,
                           passController.text,
                           usersProvider,
                           context,
+                          buttonConfigurationProvider
                         );
                       }
                     },
@@ -167,6 +171,7 @@ class LoginScreen extends StatelessWidget {
     String pass,
     UsersProvider usersProvider,
     BuildContext context,
+    ButtonConfigurationProvider buttonConfigurationProvider
   ) async {
     Users? userFromRequest = await UsersService().loginWithEmailAndPass(
       email,
@@ -174,8 +179,12 @@ class LoginScreen extends StatelessWidget {
     );
     if (userFromRequest != null) {
       usersProvider.confirmarLogueo(userFromRequest);
-    } else
+      buttonConfigurationProvider.switchBotones();
+    } else{
       usersProvider.confirmarLogueoInvalido();
+      buttonConfigurationProvider.switchBotones();
+    }
+      
   }
 }
 

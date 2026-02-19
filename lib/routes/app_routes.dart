@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/tech_product_model.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/users_model.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/actualizacion_producto.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/creacion_producto.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/home_screen.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/login_screen.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/presentation/screens/onboarding_screen.dart';
@@ -19,16 +20,71 @@ class AppRouter {
   AppRouter(this.configProvider, this.usersProvider);
 
   late final GoRouter router = GoRouter(
-    initialLocation: configProvider.isPrimeraVez ? '/onboarding' : usersProvider.userLogued != null ? '/home': configProvider.enPantallaRegistro ? '/signup' : '/login',
-    
+    initialLocation: configProvider.isPrimeraVez
+        ? '/onboarding'
+        : usersProvider.userLogued != null
+        ? '/home'
+        : configProvider.enPantallaRegistro
+        ? '/signup'
+        : '/login',
+
+    redirect: (context, state) {
+      final isPrimeraVez = configProvider.isPrimeraVez;
+      final estaLogueado = usersProvider.userLogued != null;
+      final rutaDestino = state.uri.path;
+
+      //Si es la primera vez, obligamos a que pase por el onboarding
+      if (isPrimeraVez && rutaDestino != '/onboarding') {
+        return '/onboarding';
+      }
+
+      //Definimos cuáles son las pantallas a las que se puede entrar sin cuenta
+      final esRutaPublica =
+          rutaDestino == '/login' ||
+          rutaDestino == '/signup' ||
+          rutaDestino == '/onboarding';
+
+      //Si no está logueado y la ruta no es pública
+      if (!estaLogueado && !esRutaPublica) {
+        return configProvider.enPantallaRegistro ? '/signup' : '/login';
+      }
+
+      //Si sí está logueado e intenta ir a login o registro a mano, lo mandamos a la app
+      if (estaLogueado && esRutaPublica) {
+        return '/home';
+      }
+
+      //¡Bloquear si intentan entrar a mano a rutas que necesitan un producto en extra
+      if ((rutaDestino == '/editarProducto' || rutaDestino == '/detail') && state.extra == null) {
+        return '/home';
+      }
+
+      //Proteger rutas exclusivas de administrador
+      if (rutaDestino == '/nuevoProducto' || rutaDestino == '/editarProducto') {
+        //Si el usuario está logueado pero no es administrador
+        if (estaLogueado && usersProvider.userLogued!.administrator == false) {
+          return '/home';
+        }
+      }
+
+      return null;
+    },
+
     routes: [
-      GoRoute(path: '/home', builder: (context, state){
-        final index = state.extra == null ? 0 : state.extra as int;
-        return HomeScreen(indexBottomNavigationBar: index);
-      }),
+      GoRoute(
+        path: '/home',
+        pageBuilder: (context, state) {
+          final index = state.extra == null ? 0 : state.extra as int;
+          return _buildTransition(
+            state: state,
+            child: HomeScreen(indexBottomNavigationBar: index),
+          );
+        },
+      ),
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => OnboardingScreen(),
+        pageBuilder: (context, state) =>
+            _buildTransition(state: state, child: OnboardingScreen()),
       ),
       GoRoute(
         path: '/login',
@@ -55,11 +111,22 @@ class AppRouter {
         pageBuilder: (context, state) =>
             _buildTransition(state: state, child: SettingsScreen()),
       ),
-      GoRoute(path: '/editarProducto',
-      builder: (context,state){
-        final producto = state.extra as TechProduct;
-        return ActualizacionProducto(producto: producto);
-      })
+      GoRoute(
+        path: '/editarProducto',
+        pageBuilder: (context, state) {
+          final producto = state.extra as TechProduct;
+          return _buildTransition(
+            state: state,
+            child: ActualizacionProducto(producto: producto),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/nuevoProducto',
+        pageBuilder: (context, state) {
+          return _buildTransition(state: state, child: CreacionProducto());
+        },
+      ),
     ],
   );
 

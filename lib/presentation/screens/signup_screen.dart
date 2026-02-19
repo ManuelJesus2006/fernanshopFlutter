@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/users_model.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/providers/button_configuration_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/config_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/services/users_service.dart';
@@ -16,6 +17,7 @@ class SignupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final configProvider = Provider.of<ConfigProvider>(context);
     final usersProvider = Provider.of<UsersProvider>(context);
+    final buttonConfigurationProvider = Provider.of<ButtonConfigurationProvider>(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -90,8 +92,9 @@ class SignupScreen extends StatelessWidget {
                 SizedBox(height: 20),
                 Center(
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: buttonConfigurationProvider.botonClickado ? null : () {
                       if (_keyFormulario.currentState!.validate()) {
+                        buttonConfigurationProvider.switchBotones();
                         usersProvider.mostrarCargando();
                         registro(
                           nameController.text,
@@ -99,6 +102,7 @@ class SignupScreen extends StatelessWidget {
                           passController.text,
                           usersProvider,
                           context,
+                          buttonConfigurationProvider
                         );
                       }
                     },
@@ -144,7 +148,7 @@ class SignupScreen extends StatelessWidget {
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment
-                          .start, // Alinea el icono arriba si el texto es largo
+                          .start,
                       children: [
                         Icon(
                           Icons.warning_amber_rounded,
@@ -172,7 +176,7 @@ class SignupScreen extends StatelessWidget {
                                   fontSize: 13,
                                   fontWeight: FontWeight.w400,
                                   height:
-                                      1.3, // Mejora la legibilidad de la frase larga
+                                      1.3, //Mejora la legibilidad de la frase larga
                                 ),
                               ),
                             ],
@@ -195,6 +199,7 @@ class SignupScreen extends StatelessWidget {
     String pass,
     UsersProvider usersProvider,
     BuildContext context,
+    ButtonConfigurationProvider buttonConfigurationProvider
   ) async {
     Users? userFromRequest = await UsersService().registerWithNameEmailAndPass(
       name,
@@ -203,8 +208,12 @@ class SignupScreen extends StatelessWidget {
     );
     if (userFromRequest != null) {
       usersProvider.confirmarLogueo(userFromRequest);
-    } else
+      buttonConfigurationProvider.switchBotones();
+    } else{
       usersProvider.confirmarRegistroInvalido();
+      buttonConfigurationProvider.switchBotones();
+    }
+      
   }
 }
 

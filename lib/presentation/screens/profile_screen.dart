@@ -65,15 +65,15 @@ class ProfileScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: GestureDetector(
-                  onTap: (){
-                    
-                  },
+                  onTap: ()=> context.push('/nuevoProducto'),
                   child: Container(
                     width: 300,
                     padding: EdgeInsets.all(15),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: Colors.red
+                      color: configProvider.temaOscuro
+                        ? Colors.grey[600]
+                        : Colors.indigo,
                     ),
                     
                     child: Row(

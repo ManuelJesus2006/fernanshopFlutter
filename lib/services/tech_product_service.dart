@@ -58,8 +58,8 @@ class TechProductService {
       data["characteristics"] = productoNuevo.characteristics!.toJson();
     }
 
-    Response response = await put(uri, headers: {"Content-Type": "application/json",'api_key':Env.apiKey}, body:jsonEncode(data));
-    return response.statusCode == 200;
+    Response response = await post(uri, headers: {"Content-Type": "application/json",'api_key':Env.apiKey}, body:jsonEncode(data));
+    return response.statusCode == 201;
   }
 
   Future<bool> eliminarProducto(TechProduct producto)async{

@@ -13,7 +13,7 @@ class OnboardingScreen extends StatelessWidget {
     final configProvider = Provider.of<ConfigProvider>(context);
     return Scaffold(
       backgroundColor:
-          Colors.grey[50], // Fondo gris clarito para que resalte la tarjeta
+          Colors.grey[50], //Fondo gris clarito para que resalte la tarjeta
       body: SafeArea(
         child: PageView(
           controller: _controllerPageView,
@@ -36,12 +36,11 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(
                     30,
-                  ), // Bordes redondeados de la tarjeta
+                  ), //Bordes redondeados de la tarjeta
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Icono decorativo arriba
                     const Icon(
                       Icons.shopping_bag_outlined,
                       size: 100,
@@ -78,6 +77,28 @@ class OnboardingScreen extends StatelessWidget {
                       'Donde encontrarás MILES de productos tecnológicos al mejor precio.',
                       style: TextStyle(fontSize: 18, color: Colors.white70),
                       textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        configProvider.confirmarPrimeraVez();
+                        context.push('/login');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.all(10),
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            10,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Saltar introducción e iniciar sesión',
+                        style: TextStyle(fontSize: 20, color: Colors.black),
+                      ),
                     ),
                   ],
                 ),
@@ -149,12 +170,12 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                   borderRadius: BorderRadius.circular(
                     30,
-                  ), // Bordes redondeados de la tarjeta
+                  ), //Bordes redondeados de la tarjeta
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Icono decorativo arriba
+
                     const Icon(
                       Icons.add_moderator_outlined,
                       size: 100,
@@ -163,7 +184,6 @@ class OnboardingScreen extends StatelessWidget {
 
                     const SizedBox(height: 30),
 
-                    // Textos de abajo
                     const Text(
                       'Equipado para administradores',
                       style: TextStyle(
@@ -197,18 +217,17 @@ class OnboardingScreen extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Colors.orange.shade400, // Empieza brillante
-                      Colors.deepOrange.shade600, // Termina intenso
+                      Colors.orange.shade400,
+                      Colors.deepOrange.shade600,
                     ],
                   ),
                   borderRadius: BorderRadius.circular(
                     30,
-                  ), // Bordes redondeados de la tarjeta
+                  ), //Bordes redondeados de la tarjeta
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Icono decorativo arriba
                     const Icon(
                       Icons.shopping_cart,
                       size: 100,

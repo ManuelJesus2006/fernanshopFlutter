@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/tech_product_model.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/providers/button_configuration_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/services/tech_product_service.dart';
+import 'package:provider/provider.dart';
 
 class ActualizacionProducto extends StatefulWidget {
   const ActualizacionProducto({super.key, required this.producto});
@@ -54,6 +56,7 @@ class _ActualizacionProductoState extends State<ActualizacionProducto> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final buttonConfigurationProvider = Provider.of<ButtonConfigurationProvider>(context);
 
     return Scaffold(
       backgroundColor: isDark ? Colors.grey[900] : Colors.white,
@@ -101,7 +104,7 @@ class _ActualizacionProductoState extends State<ActualizacionProducto> {
 
                     _buildInput(
                       controller: typeController,
-                      label: 'Tipo (Ej: CPU, GPU...)',
+                      label: 'Tipo (Unique options: Processor, Graphics Card, Motherboard, RAM, SSD, CPU Cooler, Power Supply and HDD)',
                       icon: Icons.category,
                       isDark: isDark,
                     ),
@@ -189,10 +192,11 @@ class _ActualizacionProductoState extends State<ActualizacionProducto> {
                             borderRadius: BorderRadius.circular(10)
                           )
                         ),
-                        onPressed: () {
+                        onPressed: buttonConfigurationProvider.botonClickado ? null : () {
+                          buttonConfigurationProvider.switchBotones();
                           if (_keyFormulario.currentState!.validate()) {
-                            _guardarProducto();
-                          }
+                            _guardarProducto(buttonConfigurationProvider);
+                          }else buttonConfigurationProvider.switchBotones();
                         },
                       ),
                     )
@@ -245,7 +249,7 @@ class _ActualizacionProductoState extends State<ActualizacionProducto> {
     );
   }
 
-  void _guardarProducto()async {
+  void _guardarProducto(ButtonConfigurationProvider buttonConfigurationProvider)async {
     try {
       final Map<String, dynamic> characteristicsJson = jsonDecode(characteristicsController.text);
       final characteristicsObj = Characteristics.fromJson(characteristicsJson);
@@ -272,7 +276,11 @@ class _ActualizacionProductoState extends State<ActualizacionProducto> {
         ),
       );
       
-      if (exito) context.pop();
+      if (exito){
+        context.pop();
+        buttonConfigurationProvider.switchBotones();
+      } 
+      else buttonConfigurationProvider.switchBotones();
 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

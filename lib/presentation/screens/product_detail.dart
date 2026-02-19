@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/models/tech_product_model.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/providers/button_configuration_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/config_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/products_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/services/tech_product_service.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetail extends StatelessWidget {
   const ProductDetail({super.key, required this.producto});
@@ -48,9 +51,7 @@ class ProductDetail extends StatelessWidget {
                               fit: BoxFit.fill,
                             ),
                           ),
-
                           SizedBox(width: 20),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,16 +79,53 @@ class ProductDetail extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 20),
-                      _botonAniadirCarrito(
-                        productsProvider: productsProvider,
-                        producto: producto,
+
+                      //Botón de carrito y WhatsApp en la misma fila
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _botonAniadirCarrito(
+                              productsProvider: productsProvider,
+                              producto: producto,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: IconButton(
+                              onPressed: () async {
+                                String mensajeAEnviar =
+                                    "¡Mira este producto que he encontrado en FernanShop!: ${producto.imageUrl}\n\n"
+                                    "${producto.name} por sólo ${producto.price.toStringAsFixed(2)}€";
+                                SharePlus.instance.share(
+                                  ShareParams(
+                                    text: mensajeAEnviar,
+                                    title: "${producto.name} en FernanShop",
+                                  ),
+                                );
+                              },
+                              icon: Icon(Icons.share, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
+
                       SizedBox(height: 10),
                       if (usersProvider.userLogued!.administrator!)
-                        _botonEditarProducto(producto: producto),
+                        Container(
+                          width: double
+                              .infinity, //El infinity hace que el botón ocupe todo el ancho
+                          child: _botonEditarProducto(producto: producto),
+                        ),
                       SizedBox(height: 10),
                       if (usersProvider.userLogued!.administrator!)
-                        _botonEliminarProducto(producto: producto),
+                        Container(
+                          width: double.infinity,
+                          child: _botonEliminarProducto(producto: producto),
+                        ),
                       SizedBox(height: 30),
                       Text('Características', style: TextStyle(fontSize: 20)),
                       producto.characteristics != null
@@ -178,9 +216,10 @@ class _botonEliminarProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final buttonConfigurationProvider = Provider.of<ButtonConfigurationProvider>(context);
     return TextButton(
       onPressed: () {
-        _openConfirmationDialog(context, producto);
+        _openConfirmationDialog(context, producto, buttonConfigurationProvider);
       },
 
       style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -191,7 +230,7 @@ class _botonEliminarProducto extends StatelessWidget {
     );
   }
 
-  void _openConfirmationDialog(BuildContext context, TechProduct producto) {
+  void _openConfirmationDialog(BuildContext context, TechProduct producto, ButtonConfigurationProvider buttonConfigurationProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -203,11 +242,12 @@ class _botonEliminarProducto extends StatelessWidget {
             child: Text('No, mantener el producto'),
           ),
           TextButton(
-            onPressed: () async {
+            onPressed: buttonConfigurationProvider.botonClickado ? null : () async {
+              buttonConfigurationProvider.switchBotones();
               bool exito = await TechProductService().eliminarProducto(
                 producto,
               );
-              
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
@@ -223,7 +263,10 @@ class _botonEliminarProducto extends StatelessWidget {
                 ),
               );
 
-              if (exito) context.go('/home');
+              if (exito){
+                context.go('/home');
+                buttonConfigurationProvider.switchBotones();
+              }else buttonConfigurationProvider.switchBotones();
             },
             child: Text('Si, eliminar el producto'),
           ),

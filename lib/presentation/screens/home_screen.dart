@@ -139,7 +139,6 @@ class _mostrarProductos extends StatelessWidget {
           return GestureDetector(
             onTap: () => context.push('/detail', extra: productos[index]),
             child: Container(
-              // Todo tu diseño original intacto 👇
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
