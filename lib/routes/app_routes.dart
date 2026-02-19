@@ -20,7 +20,7 @@ class AppRouter {
 
   late final GoRouter router = GoRouter(
     initialLocation: configProvider.isPrimeraVez ? '/onboarding' : usersProvider.userLogued != null ? '/home': configProvider.enPantallaRegistro ? '/signup' : '/login',
-
+    
     routes: [
       GoRoute(path: '/home', builder: (context, state){
         final index = state.extra == null ? 0 : state.extra as int;
