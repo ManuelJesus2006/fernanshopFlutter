@@ -61,6 +61,38 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(
                 height: 20,
               ),
+              if (user.administrator!)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: GestureDetector(
+                  onTap: (){
+                    
+                  },
+                  child: Container(
+                    width: 300,
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.red
+                    ),
+                    
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add, color: Colors.white,),
+
+                        Text(
+                          'Añadir un nuevo producto',
+                          style: TextStyle(fontSize: 17, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 100),
                 child: GestureDetector(

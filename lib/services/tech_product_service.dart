@@ -25,13 +25,6 @@ class TechProductService {
 
   Future<bool> actualizarProductoByID(TechProduct productoActualizado) async {
     Uri uri = Uri.parse('${Env.endPointBase}/${productoActualizado.id}');
-    // print(productoActualizado.releaseDate);
-    // String fechaFormateada = productoActualizado.releaseDate.toString(); 
-    // print(fechaFormateada);
-    // if (fechaFormateada.contains('T')) {
-    //   fechaFormateada = fechaFormateada.split('T')[0];
-    // }
-    // print(fechaFormateada);
     Map<String, dynamic> data = {
       "business": productoActualizado.business,
       "name": productoActualizado.name,
@@ -47,5 +40,32 @@ class TechProductService {
 
     Response response = await put(uri, headers: {"Content-Type": "application/json",'api_key':Env.apiKey}, body:jsonEncode(data));
     return response.statusCode == 200;
+  }
+
+  Future<bool> crearProducto(TechProduct productoNuevo) async {
+    Uri uri = Uri.parse('${Env.endPointBase}');
+
+    Map<String, dynamic> data = {
+      "business": productoNuevo.business,
+      "name": productoNuevo.name,
+      "type": productoNuevo.type,
+      "price": productoNuevo.price, 
+      "imageUrl": productoNuevo.imageUrl,
+      "release_date": productoNuevo.releaseDate!.toIso8601String().split('T')[0],
+    };
+
+    if (productoNuevo.characteristics != null && productoNuevo.characteristics!.hasData) {
+      data["characteristics"] = productoNuevo.characteristics!.toJson();
+    }
+
+    Response response = await put(uri, headers: {"Content-Type": "application/json",'api_key':Env.apiKey}, body:jsonEncode(data));
+    return response.statusCode == 200;
+  }
+
+  Future<bool> eliminarProducto(TechProduct producto)async{
+    Uri uri = Uri.parse('${Env.endPointBase}/${producto.id}');
+
+    Response response = await delete(uri, headers: {"Content-Type": "application/json",'api_key':Env.apiKey});
+    return response.statusCode == 204;
   }
 }

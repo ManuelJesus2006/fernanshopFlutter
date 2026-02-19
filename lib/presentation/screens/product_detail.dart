@@ -4,6 +4,7 @@ import 'package:practica_obligatoria_tema5_fernanshop/models/tech_product_model.
 import 'package:practica_obligatoria_tema5_fernanshop/providers/config_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/products_provider.dart';
 import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.dart';
+import 'package:practica_obligatoria_tema5_fernanshop/services/tech_product_service.dart';
 import 'package:provider/provider.dart';
 
 class ProductDetail extends StatelessWidget {
@@ -69,31 +70,29 @@ class ProductDetail extends StatelessWidget {
                                     fontSize: 35,
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Text('Tipo: ${producto.type}')
+                                SizedBox(height: 20),
+                                Text('Tipo: ${producto.type}'),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 20,
+                      SizedBox(height: 20),
+                      _botonAniadirCarrito(
+                        productsProvider: productsProvider,
+                        producto: producto,
                       ),
-                      _botonAniadirCarrito(productsProvider: productsProvider, producto: producto),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       if (usersProvider.userLogued!.administrator!)
-                      _botonEditarProducto(productsProvider: productsProvider, producto: producto),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Text('Características', style: TextStyle(fontSize: 20),),
-                      producto.characteristics != null ?
-                      _mostrarCaracteristics(producto: producto) : Text('No disponibles')
-                      
+                        _botonEditarProducto(producto: producto),
+                      SizedBox(height: 10),
+                      if (usersProvider.userLogued!.administrator!)
+                        _botonEliminarProducto(producto: producto),
+                      SizedBox(height: 30),
+                      Text('Características', style: TextStyle(fontSize: 20)),
+                      producto.characteristics != null
+                          ? _mostrarCaracteristics(producto: producto)
+                          : Text('No disponibles'),
                     ],
                   ),
                 ),
@@ -122,13 +121,20 @@ class _botonAniadirCarrito extends StatelessWidget {
       onPressed: () {
         productsProvider.aniadirProductoCarro(producto);
         ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Se ha insertado el producto con éxito'),
-              action: SnackBarAction(label: 'Ver en el carro', onPressed: () {context.push('/home',extra: 2);}),
-              duration: const Duration(seconds: 2),),
-              
-            );
+          SnackBar(
+            content: Text('Se ha insertado el producto con éxito'),
+            action: SnackBarAction(
+              label: 'Ver en el carro',
+              onPressed: () {
+                //Ponemos en el extra la posición del bottomNavigationBar donde está el carro
+                context.push('/home', extra: 2);
+              },
+            ),
+            duration: const Duration(seconds: 5),
+          ),
+        );
       },
-    
+
       style: ElevatedButton.styleFrom(
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey[600]
@@ -143,20 +149,15 @@ class _botonAniadirCarrito extends StatelessWidget {
 }
 
 class _botonEditarProducto extends StatelessWidget {
-  const _botonEditarProducto({
-    super.key,
-    required this.productsProvider,
-    required this.producto,
-  });
+  const _botonEditarProducto({super.key, required this.producto});
 
-  final ProductsProvider productsProvider;
   final TechProduct producto;
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: ()=> context.push('/editarProducto',extra: producto),
-    
+      onPressed: () => context.push('/editarProducto', extra: producto),
+
       style: ElevatedButton.styleFrom(
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey[600]
@@ -170,6 +171,68 @@ class _botonEditarProducto extends StatelessWidget {
   }
 }
 
+class _botonEliminarProducto extends StatelessWidget {
+  const _botonEliminarProducto({super.key, required this.producto});
+
+  final TechProduct producto;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: () {
+        _openConfirmationDialog(context, producto);
+      },
+
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+      child: Text(
+        'Eliminar producto🗑️',
+        style: TextStyle(color: Colors.white, fontSize: 20),
+      ),
+    );
+  }
+
+  void _openConfirmationDialog(BuildContext context, TechProduct producto) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('¿Estas seguro de eliminar ${producto.name}?'),
+        content: Text('''Esta acción no se puede desacer'''),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: Text('No, mantener el producto'),
+          ),
+          TextButton(
+            onPressed: () async {
+              bool exito = await TechProductService().eliminarProducto(
+                producto,
+              );
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    exito
+                        ? 'Producto eliminado correctamente'
+                        : 'Error al eliminar el producto',
+                  ),
+                  backgroundColor: exito
+                      ? (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.green[700]
+                            : Colors.indigo)
+                      : Colors.red,
+                ),
+              );
+
+              if (exito) context.go('/home');
+            },
+            child: Text('Si, eliminar el producto'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _mostrarCaracteristics extends StatelessWidget {
   const _mostrarCaracteristics({super.key, required this.producto});
 
@@ -177,7 +240,6 @@ class _mostrarCaracteristics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final c = producto.characteristics!;
     print(c.toJson().toString());
 
@@ -190,12 +252,12 @@ class _mostrarCaracteristics extends StatelessWidget {
         _buildRow('Memoria', c.memory),
         _buildRow('Frecuencia Boost', c.boostClock),
         _buildRow('TDP', c.tdp),
-        
+
         // Placas Base
         _buildRow('Socket', c.socket),
         _buildRow('Chipset', c.chipset),
         _buildRow('Factor de forma', c.formFactor),
-        
+
         // Almacenamiento
         _buildRow('Tipo', c.type),
         _buildRow('Interfaz', c.characteristicsInterface),
@@ -203,13 +265,13 @@ class _mostrarCaracteristics extends StatelessWidget {
         _buildRow('Velocidad Escritura', c.speedWrite),
         _buildRow('RPM', c.rpm),
         _buildRow('Caché', c.cache),
-        
+
         // Torres / Refrigeración
         _buildRow('Ventiladores', c.fans),
         _buildRow('Ruido', c.noise),
         _buildRow('Altura', c.height),
         _buildRow('Ventilador', c.fan),
-        
+
         // Fuentes de alimentación
         _buildRow('Potencia', c.wattage),
         _buildRow('Eficiencia', c.efficiency),
@@ -224,10 +286,7 @@ class _mostrarCaracteristics extends StatelessWidget {
     }
 
     return ListTile(
-      title: Text(
-        '$titulo: $valor',
-        style: const TextStyle(fontSize: 15),
-      ),
+      title: Text('$titulo: $valor', style: const TextStyle(fontSize: 15)),
       leading: const Icon(Icons.info_outline, size: 20),
       visualDensity: VisualDensity.compact,
     );
