@@ -8,7 +8,6 @@ import 'package:practica_obligatoria_tema5_fernanshop/providers/users_provider.d
 import 'package:practica_obligatoria_tema5_fernanshop/services/tech_product_service.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetail extends StatelessWidget {
   const ProductDetail({super.key, required this.producto});
@@ -65,7 +64,7 @@ class ProductDetail extends StatelessWidget {
                                 ),
                                 SizedBox(height: 10),
                                 Text(
-                                  '${producto.price.toString()}€',
+                                  '${producto.price.toStringAsFixed(2)}€',
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 35,
@@ -165,6 +164,7 @@ class _botonAniadirCarrito extends StatelessWidget {
               label: 'Ver en el carro',
               onPressed: () {
                 //Ponemos en el extra la posición del bottomNavigationBar donde está el carro
+                if (!context.mounted) return;
                 context.push('/home', extra: 2);
               },
             ),

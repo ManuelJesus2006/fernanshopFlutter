@@ -186,7 +186,7 @@ class _ActualizacionProductoState extends State<ActualizacionProducto> {
                         icon: const Icon(Icons.save),
                         label: const Text('Guardar Cambios'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark ? Colors.indigoAccent : Colors.indigo,
+                          backgroundColor: isDark ? Colors.grey[700] : Colors.indigo,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)
@@ -277,7 +277,7 @@ class _ActualizacionProductoState extends State<ActualizacionProducto> {
       );
       
       if (exito){
-        context.pop();
+        context.go('/home');
         buttonConfigurationProvider.switchBotones();
       } 
       else buttonConfigurationProvider.switchBotones();

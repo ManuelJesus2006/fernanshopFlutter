@@ -158,7 +158,7 @@ class _mostrarProductos extends StatelessWidget {
                     textAlign: TextAlign.start,
                   ),
                   Text(
-                    '${productos[index].price.toString()}€',
+                    '${productos[index].price.toStringAsFixed(2)}€',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                     textAlign: TextAlign.end,
                   ),

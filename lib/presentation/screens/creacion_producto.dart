@@ -204,7 +204,7 @@ class _CreacionProductoState extends State<CreacionProducto> {
                         icon: const Icon(Icons.add),
                         label: const Text('Crear Producto'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark ? Colors.indigoAccent : Colors.indigo,
+                          backgroundColor: isDark ? Colors.grey[700] : Colors.indigo,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)
