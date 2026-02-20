@@ -163,8 +163,9 @@ class _botonAniadirCarrito extends StatelessWidget {
             action: SnackBarAction(
               label: 'Ver en el carro',
               onPressed: () {
-                //Ponemos en el extra la posición del bottomNavigationBar donde está el carro
+                //Verificamos si esta montado para evitar el crash
                 if (!context.mounted) return;
+                //Ponemos en el extra la posición del bottomNavigationBar donde está el carro
                 context.push('/home', extra: 2);
               },
             ),
